@@ -243,11 +243,9 @@ and generates grounded, context-aware answers.
 
 ## 📸 Screenshots
 
-```markdown
 ![Uploading Docs](screenshot/processing.png)
 ![Processed Docs](screenshot/processed.png)
 ![Query Example](screenshot/askingquestion.png)
-```
 
 ---
 
