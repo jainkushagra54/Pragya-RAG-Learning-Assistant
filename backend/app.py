@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
 
-from backend.rag.query_data_llm import query_rag
-from backend.rag.populatedb import ingest_data
+from rag.query_data_llm import query_rag
+from rag.populatedb import ingest_data
 
 app = FastAPI()
 
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATA_PATH = "backend/data"
+DATA_PATH = "data"
 os.makedirs(DATA_PATH, exist_ok=True)
 
 @app.post("/process")
@@ -28,7 +28,7 @@ async def process(files: list[UploadFile] = File([]), youtube: str = Form(None))
             shutil.copyfileobj(file.file, buffer)
 
     if youtube:
-        with open("backend/youtube_links.txt", "a") as f:
+        with open("youtube_links.txt", "a") as f:
             f.write(youtube + "\n")
 
     ingest_data(reset=False)
