@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://pragya-rag-learning-assistant.onrender.com";
 
 
 function addMessage(text, type) {
