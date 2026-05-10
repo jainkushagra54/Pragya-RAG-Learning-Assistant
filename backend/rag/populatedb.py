@@ -6,12 +6,12 @@ from langchain_community.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores.chroma import Chroma
 
-from backend.rag.get_embedding_function import get_embedding_function
-from backend.rag.youtube_loader import load_youtube_transcript
+from rag.get_embedding_function import get_embedding_function
+from rag.youtube_loader import load_youtube_transcript
 
-CHROMA_PATH = "backend/chroma"
-DATA_PATH = "backend/data"
-YOUTUBE_FILE = "backend/rag/youtube_links.txt"
+CHROMA_PATH = "chroma"
+DATA_PATH = "data"
+YOUTUBE_FILE = "rag/youtube_links.txt"
 
 
 def ingest_data(reset=False):

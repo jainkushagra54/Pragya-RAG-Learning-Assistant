@@ -1,13 +1,13 @@
-from backend.llm.llm_client import query_llm
+from llm.llm_client import query_llm
 import argparse
 
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_classic.prompts import ChatPromptTemplate
 # from langchain_community.llms.ollama import Ollama
 
-from backend.rag.get_embedding_function import get_embedding_function
+from rag.get_embedding_function import get_embedding_function
 
-CHROMA_PATH = "backend/chroma"
+CHROMA_PATH = "chroma"
 
 PROMPT_TEMPLATE = """
 You are a teaching assistant.
