@@ -10,3 +10,4 @@ google-genai
 langchain-classic
 requests
 langchain-google-genai
+python-multipart
