@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragya</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <div class="logo-area">
+        <h1>Pragya</h1>
+        <span class="creator-name">by Kushagra</span>
+    </div>
+</header>
+
+<main>
+
+    <div class="sidebar">
+
+        <h2>Upload PDFs</h2>
+        <input type="file" id="pdfUpload" multiple>
+
+        <h2>YouTube Link</h2>
+        <input type="text" id="youtubeLink" placeholder="Paste link">
+
+        <button onclick="processData()">Process Data</button>
+
+        <div id="statusBox" class="status-box"></div>
+
+    </div>
+
+    <div class="chat">
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-box">
+
+            <input
+                type="text"
+                id="question"
+                placeholder="Ask anything..."
+                onkeydown="handleKey(event)"
+            >
+
+            <button onclick="askQuestion()">↑</button>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>
