@@ -1,7 +1,8 @@
-from langchain_huggingface import HuggingFaceEmbeddings
-
+import os
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 def get_embedding_function():
-    return HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2"
+    return GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001",
+        google_api_key=os.getenv("API_KEY")
     )
