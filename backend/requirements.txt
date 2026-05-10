@@ -4,8 +4,11 @@ langchain-huggingface
 chromadb
 pypdf
 youtube-transcript-api
-sentence-transformers
-openai
-requests
 fastapi
+uvicorn
+python-dotenv
 google-genai
+langchain-classic
+requests
+sentence-transformers
+torch --index-url https://download.pytorch.org/whl/cpu
