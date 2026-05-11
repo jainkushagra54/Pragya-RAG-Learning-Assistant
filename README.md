@@ -260,14 +260,15 @@ Open `frontend/index.html` in your browser, or use the **VSCode Live Server** ex
 
 ## 📸 Screenshots
 
-### Asking a Question
-![Asking a Question](screenshot/askingquestion.png)
 
 ### Processing Documents
 ![Processing](screenshot/processing.png)
 
 ### Processed Successfully
 ![Processed](screenshot/processed.png)
+
+### Asking a Question
+![Asking a Question](screenshot/askingquestion.png)
 
 ---
 
