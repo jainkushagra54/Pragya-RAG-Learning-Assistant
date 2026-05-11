@@ -22,7 +22,12 @@ def load_youtube_transcript(url: str, chunk_size=800):
     )
 
     data = response.json()
-    full_text = data.get("content", "")
+    content = data.get("content", "")
+
+    if isinstance(content, list):
+        full_text = " ".join([item.get("text", "") for item in content])
+    else:
+        full_text = content
 
     if not full_text:
         raise ValueError("No transcript found")
