@@ -9,6 +9,9 @@
 [![Gemini](https://img.shields.io/badge/Google-Gemini%20API-blue?logo=google)](https://ai.google.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
+🔗 **Live Demo:** [Pragya on GitHub Pages](https://jainkushagra54.github.io/Pragya-RAG-Learning-Assistant)
+⭐ **Backend:** Deployed on Render (US West)
+
 ---
 
 ## 📌 Overview
@@ -21,12 +24,7 @@ No hallucinations from generic web knowledge. Just answers from *your* material.
 
 ## 🎯 Why I Built This
 
-As a student, I constantly juggled:
-- 📄 PDFs and class notes
-- 🎥 YouTube lecture videos
-- 🔍 Search tabs for every concept
-
-Finding a single concept across all these sources is slow and frustrating. Pragya unifies them into one AI-powered interface where you can upload your material, ask questions naturally, and get grounded answers — combining formal definitions from notes with intuitive explanations from lectures.
+Every exam season I found myself juggling between PDFs, YouTube lectures, and search tabs trying to find one concept. Pragya unifies them into one AI-powered interface where you can upload your material, ask questions naturally, and get grounded answers — combining formal definitions from notes with intuitive explanations from lectures.
 
 ---
 
@@ -35,7 +33,7 @@ Finding a single concept across all these sources is slow and frustrating. Pragy
 | Feature | Status |
 |---|---|
 | PDF Upload & Processing | ✅ |
-| YouTube Transcript Ingestion | ✅ |
+| YouTube Transcript Ingestion via Supadata API | ✅ |
 | Semantic Search via Vector Embeddings | ✅ |
 | Context-Aware AI Answers | ✅ |
 | Source-Aware Responses | ✅ |
@@ -45,6 +43,7 @@ Finding a single concept across all these sources is slow and frustrating. Pragy
 | ChromaDB Vector Storage | ✅ |
 | Google Gemini LLM Integration | ✅ |
 | Dark-Themed Modern UI | ✅ |
+| Deployed on GitHub Pages + Render | ✅ |
 
 ---
 
@@ -54,13 +53,14 @@ One of the most significant milestones of this project was a **~94% reduction in
 
 | Version | LLM Provider | Query Latency |
 |---|---|---|
-| V0 (initial) | NVIDIA NIM | ~76 seconds |
-| V1 (current) | Google Gemini | ~4.2–4.3 seconds |
+| V-1 (offline) | Ollama Mistral (local) | Varies by hardware |
+| V0 | NVIDIA NIM API | ~76 seconds |
+| V1 (current) | Google Gemini API | ~4.2–4.3 seconds |
 
-**Same query. Same API structure. 18× faster.**
+**Same query. Same pipeline. 18× faster than NIM.**
 
-> **Why the switch?**
-> NVIDIA NIM offered 40 requests/second throughput, but real-world latency was unacceptably high for a conversational interface. Migrating to the **Google Gemini API** brought latency down to ~4.2 seconds, making the experience feel genuinely interactive.
+> **Why the switch from NIM to Gemini?**
+> NVIDIA NIM offered 40 requests/second throughput on paper, but real-world latency hit 76 seconds per query — unusable for a conversational interface. Migrating to **Google Gemini API** brought latency down to ~4.2 seconds.
 >
 > ⚠️ **Current Gemini limitation:** The free tier is capped at **20 requests/day**. For heavier usage, upgrade to a paid Gemini API plan.
 
@@ -74,10 +74,16 @@ One of the most significant milestones of this project was a **~94% reduction in
 - **LangChain** — RAG orchestration
 - **ChromaDB** — Vector database for semantic storage
 - **Google Gemini API** — LLM for answer generation
-- **YouTube Transcript API** — Lecture ingestion
+- **Hugging Face Embeddings** — Vector embeddings via API
+- **Supadata API** — YouTube transcript ingestion (bypasses cloud IP blocks)
 
 ### Frontend
 - **HTML / CSS / JavaScript** — Responsive, dark-themed chat UI
+- **GitHub Pages** — Frontend hosting
+
+### Deployment
+- **Render (US West)** — FastAPI backend hosting
+- **GitHub Pages** — Static frontend hosting
 
 ### AI / NLP
 - Retrieval-Augmented Generation (RAG)
@@ -93,10 +99,10 @@ One of the most significant milestones of this project was a **~94% reduction in
 User Question
       │
       ▼
-Frontend (HTML/CSS/JS)
+Frontend (HTML/CSS/JS) — GitHub Pages
       │
       ▼
-FastAPI Backend
+FastAPI Backend — Render (US West)
       │
       ▼
 Embedding Search (ChromaDB)
@@ -129,20 +135,27 @@ Pragya/
 │   │   └── llm_client.py              # Gemini API integration
 │   │
 │   ├── rag/
-│   │   ├── get_embedding_function.py  # Embedding model setup
+│   │   ├── get_embedding_function.py  # Hugging Face embedding setup
 │   │   ├── populatedb.py              # Chunk & embed pipeline
 │   │   ├── query_data_llm.py          # RAG querying logic
-│   │   └── youtube_loader.py          # YouTube transcript ingestion
+│   │   ├── youtube_links.txt          # YouTube links storage
+│   │   └── youtube_loader.py          # Supadata transcript ingestion
 │   │
-│   ├── .env                           # Environment variables
+│   ├── .env                           # Environment variables (local)
 │   ├── app.py                         # FastAPI server
-│   ├── requirements.txt
-│   └── youtube_links.txt
+│   └── requirements.txt
 │
-└── frontend/
-    ├── index.html
-    ├── script.js
-    └── style.css
+├── frontend/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+│
+├── screenshot/
+│   ├── askingquestion.png
+│   ├── processed.png
+│   └── processing.png
+│
+└── README.md
 ```
 
 ---
@@ -158,14 +171,14 @@ Pragya/
 **PDFs:**
 1. Extract text from document
 2. Split into semantic chunks
-3. Generate vector embeddings
+3. Generate vector embeddings via Hugging Face
 4. Store in ChromaDB
 
 **YouTube Videos:**
-1. Fetch transcript via YouTube Transcript API
-2. Chunk transcript by segment
+1. Fetch transcript via **Supadata API** (bypasses YouTube cloud IP restrictions)
+2. Chunk transcript by word count
 3. Generate vector embeddings
-4. Store with timestamps for traceability
+4. Store in ChromaDB
 
 ### 3. Query & Answer
 1. User question is embedded
@@ -176,16 +189,34 @@ Pragya/
 
 ---
 
-## 🚀 Getting Started
+## ⚠️ Important Notes on Deployment
+
+### Ephemeral Storage
+Render's free tier uses an **ephemeral filesystem** — the ChromaDB vector database is wiped every time the server restarts or spins down (after 15 minutes of inactivity).
+
+**Recommended workflow:**
+1. Upload all PDFs + YouTube links together in one session
+2. Process everything at once
+3. Ask your questions
+4. For a fresh session — restart the Render service and re-upload
+
+### YouTube Transcript Ingestion
+Direct YouTube Transcript API calls are blocked on cloud provider IPs (AWS, GCP, Azure, Render, etc.). Pragya uses **Supadata API** to bypass this restriction.
+
+---
+
+## 🚀 Getting Started (Local)
 
 ### Prerequisites
 - Python 3.10+
 - A [Google Gemini API key](https://ai.google.dev)
+- A [Hugging Face API token](https://huggingface.co/settings/tokens)
+- A [Supadata API key](https://supadata.ai) (for YouTube transcripts)
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd Pragya
+git clone https://github.com/jainkushagra54/Pragya-RAG-Learning-Assistant.git
+cd Pragya-RAG-Learning-Assistant
 ```
 
 ### 2. Create & Activate Virtual Environment
@@ -209,6 +240,8 @@ pip install -r backend/requirements.txt
 Create a `.env` file inside the `backend/` folder:
 ```env
 API_KEY=YOUR_GEMINI_API_KEY
+HF_TOKEN=YOUR_HUGGING_FACE_TOKEN
+SUPADATA_API_KEY=YOUR_SUPADATA_API_KEY
 ```
 
 ### 5. Run the Backend
@@ -221,43 +254,33 @@ Backend will be available at: `http://localhost:8000`
 
 ### 6. Launch the Frontend
 
-Open `frontend/index.html` in your browser, or use the **VSCode Live Server** extension for hot-reloading.
-
----
-
-## 💡 Example Workflow
-
-```
-1. Upload: "operating_systems_notes.pdf"
-2. Add YouTube link: https://youtube.com/watch?v=...
-3. Ask:
-   → "What is deadlock?"
-   → "Explain paging with an intuition"
-   → "What is the difference between a process and a thread?"
-
-Pragya retrieves relevant chunks from your material
-and generates grounded, context-aware answers.
-```
+Open `frontend/index.html` in your browser, or use the **VSCode Live Server** extension.
 
 ---
 
 ## 📸 Screenshots
 
-![Uploading Docs](screenshot/processing.png)
-![Processed Docs](screenshot/processed.png)
-![Query Example](screenshot/askingquestion.png)
+### Asking a Question
+![Asking a Question](screenshot/askingquestion.png)
+
+### Processing Documents
+![Processing](screenshot/processing.png)
+
+### Processed Successfully
+![Processed](screenshot/processed.png)
 
 ---
 
 ## 🧩 Challenges Faced
 
-- Managing long-context prompts within API token limits
-- Handling Gemini API daily quota constraints (20 requests/day on free tier)
-- Optimizing retrieval quality — right chunk size, overlap, and top-k selection
-- Structuring chunk metadata for source-aware responses
-- Frontend-backend integration with async query handling
-- Maintaining answer groundedness (no hallucinated content)
-- Organizing ChromaDB vector storage across multiple ingestion sessions
+- **Memory limits** — PyTorch CUDA packages exceeded Render's 512MB free tier RAM; switched to Hugging Face Inference API
+- **Region restrictions** — Google embedding API blocked in Singapore; moved Render service to US West region
+- **YouTube IP blocks** — YouTube blocks all cloud provider IPs; integrated Supadata API as a workaround
+- **CORS configuration** — `allow_credentials=True` is incompatible with `allow_origins=["*"]`; fixed by setting credentials to False
+- **Ephemeral filesystem** — ChromaDB data wiped on every restart; documented workaround for demo usage
+- **Silent errors** — Many deployment crashes had no visible traceback; used `python -c "import app"` to surface errors
+- **Gemini API daily quota** — 20 requests/day on free tier
+- **Port timeout** — Render's port scanner timing out before heavy models finished loading
 
 ---
 
@@ -265,36 +288,35 @@ and generates grounded, context-aware answers.
 
 ### V2 — AI & Retrieval Upgrades
 - [ ] Streaming responses (token-by-token output)
-- [ ] Multi-LLM support (switch between Gemini, GPT-4, Claude, etc.)
-- [ ] Smarter, adaptive chunking strategies
+- [ ] Multi-LLM support (Gemini, GPT-4, Claude)
+- [ ] Smarter adaptive chunking strategies
 - [ ] Multimodal retrieval (images, graphs, tables from PDFs)
-- [ ] Summarization pipeline per document
+- [ ] Persistent vector storage with Pinecone
 
 ### V3 — Product Features
 - [ ] Authentication system
 - [ ] Per-user vector databases
 - [ ] Persistent chat history
 - [ ] Document management dashboard
-- [ ] Support for PPT/PPTX, DOCX, Images, Scanned PDFs (OCR)
+- [ ] Support for PPT/PPTX, DOCX, Scanned PDFs (OCR)
 
 ### Performance
-- [ ] Faster retrieval with hybrid search (BM25 + semantic)
-- [ ] Better indexing strategies
+- [ ] Hybrid search (BM25 + semantic)
 - [ ] Lower query latency (target: < 2s)
+- [ ] Higher Gemini API quota
 
 ---
 
 ## 📚 Key Learnings
 
-Building Pragya gave me hands-on experience with:
-
-- Real-world RAG pipeline design
+- Real-world RAG pipeline design and deployment
 - Vector databases and embedding workflows
 - Prompt engineering for grounded, source-faithful answers
 - LLM API integration and quota management
-- Frontend/backend communication with FastAPI
-- Latency profiling and optimization
-- Scalable architecture thinking for AI-native applications
+- Production debugging — surfaces errors that never appear locally
+- CORS, port binding, and cloud deployment constraints
+- Ephemeral vs persistent storage in stateless deployments
+- Bypassing cloud IP restrictions with third-party APIs
 
 ---
 
@@ -302,7 +324,7 @@ Building Pragya gave me hands-on experience with:
 
 **Kushagra Jain**
 
-Built as a personal project to explore AI systems, retrieval-augmented generation, backend engineering, and intelligent educational tooling.
+Built as a personal project during exam season to solve a real problem — and ended up learning more from the deployment than from the code itself.
 
 ---
 
