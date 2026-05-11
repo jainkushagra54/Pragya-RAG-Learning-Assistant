@@ -28,7 +28,7 @@ async def process(files: list[UploadFile] = File([]), youtube: str = Form(None))
             shutil.copyfileobj(file.file, buffer)
 
     if youtube:
-        with open("youtube_links.txt", "a") as f:
+        with open("rag/youtube_links.txt", "a") as f:
             f.write(youtube + "\n")
 
     ingest_data(reset=False)
