@@ -6,7 +6,7 @@ youtube-transcript-api
 fastapi
 uvicorn
 python-dotenv
-langchain-google-genai
+langchain-huggingface
 langchain-classic
 requests
 python-multipart
