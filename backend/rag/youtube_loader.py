@@ -1,6 +1,6 @@
-from youtube_transcript_api import YouTubeTranscriptApi
+import requests
 from langchain_classic.schema.document import Document
-
+import os
 
 def extract_video_id(url: str) -> str:
     if "v=" in url:
@@ -14,24 +14,25 @@ def extract_video_id(url: str) -> str:
 def load_youtube_transcript(url: str, chunk_size=800):
     video_id = extract_video_id(url)
 
-    api = YouTubeTranscriptApi()
-    transcript = api.fetch(video_id)
+    api_key = os.getenv("SUPADATA_API_KEY")
+    response = requests.get(
+        f"https://api.supadata.ai/v1/youtube/transcript",
+        params={"videoId": video_id, "text": True},
+        headers={"x-api-key": api_key}
+    )
+
+    data = response.json()
+    full_text = data.get("content", "")
+
+    if not full_text:
+        raise ValueError("No transcript found")
 
     documents = []
     buffer_text = ""
-    start_time = None
+    words = full_text.split()
 
-    for entry in transcript:
-        text = entry.text.strip()
-
-        if not text:
-            continue
-
-        if start_time is None:
-            start_time = int(entry.start)
-
-        buffer_text += " " + text
-
+    for i, word in enumerate(words):
+        buffer_text += " " + word
         if len(buffer_text) >= chunk_size:
             documents.append(
                 Document(
@@ -39,13 +40,12 @@ def load_youtube_transcript(url: str, chunk_size=800):
                     metadata={
                         "source": url,
                         "type": "youtube",
-                        "timestamp": start_time,
+                        "timestamp": 0,
                         "video_id": video_id,
                     },
                 )
             )
             buffer_text = ""
-            start_time = None
 
     if buffer_text:
         documents.append(
@@ -54,7 +54,7 @@ def load_youtube_transcript(url: str, chunk_size=800):
                 metadata={
                     "source": url,
                     "type": "youtube",
-                    "timestamp": start_time or 0,
+                    "timestamp": 0,
                     "video_id": video_id,
                 },
             )
